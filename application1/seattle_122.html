@@ -1,0 +1,115 @@
+<!-- https://d3js.org/d3.v7.min.js -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Seattle Weather data Visualization</title>
+    <style>
+        #chart {
+            width: 400px;
+            height: 300px;
+            margin: 20px;
+            background-color: #ffffff;
+        }
+
+        .bar {
+            fill: steelblue;
+        }
+
+        .bar:hover {
+            fill: orange;
+        }
+
+        .x-label {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .y-label {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+    </style>
+    <script src="d3.v7.min.js"></script>
+</head>
+<body>
+    <h1 style="font-family: Arial, sans-serif;">Seattle-weather data Wind distribution histogram with 25 bins</h1><br>
+    <div id="chart"></div>
+
+    <script>
+        d3.csv("seattle-weather.csv")
+        .then(function(data){
+            return data.map(function(d){
+                return {
+                    wind : parseFloat(d.wind) 
+                }; 
+            });
+        })
+        .then(function(data) {
+            
+            var margin = { top: 20, right: 30, bottom: 30, left: 60 };
+            var width = 400 - margin.left - margin.right;
+            var height = 300 - margin.top - margin.bottom;
+            
+            var svg = d3.select('#chart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom + 50)
+                .append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+            var x = d3.scaleLinear()
+                .domain([0, Math.ceil(d3.max(data, function(d) { return +d.wind }))]) 
+                .range([0, width]);
+
+            svg.append('g')
+                .attr('transform', 'translate(0,' + height + ')')
+                .call(d3.axisBottom(x));
+            
+            var binCount = 25;
+
+            var histogram = d3.histogram()
+                .value(function(d) { return d.wind; })
+                .domain(x.domain())
+                .thresholds(x.ticks(binCount))
+
+            var bins = histogram(data);
+
+            var y = d3.scaleLinear()
+                .domain([0, d3.max(bins, function(d) { return d.length; })])
+                .range([height, 0]);
+            
+            svg.append('g')
+                .call(d3.axisLeft(y));
+            
+            svg.selectAll("rect")
+                .data(bins)
+                .enter()
+                .append("rect")
+                .attr("x", 1)
+                .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                .attr("height", function(d) { return height - y(d.length); })
+                .style("fill", "#2281E5")
+
+            svg.append('text')
+                .attr('class', 'x-label')
+                .attr('x', width / 2)
+                .attr('y', height + margin.top + 20)
+                .style('text-anchor', 'middle')
+                .text('Wind value')
+                .style('text-anchor', 'middle');
+
+            svg.append('text')
+                .attr('class', 'y-label')
+                .attr('transform', 'rotate(-90)')
+                .attr('x', -height / 2)
+                .attr('y', -margin.left)
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle')
+                .text('Frequency')
+                .style('text-anchor', 'middle');
+        });
+    </script>
+</body>
+</html>
+
+

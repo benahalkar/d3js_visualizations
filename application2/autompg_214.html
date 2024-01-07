@@ -1,0 +1,66 @@
+<!-- https://d3js.org/d3.v7.min.js -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto-mpg data Visualization</title>
+    <style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+    </style>
+    <script src="d3.v7.min.js"></script>
+</head>
+<body>
+    <h1 style="font-family: Arial, sans-serif;">Auto-mpg count of cars by acceleration Table</h1><br>
+    <table id="csvTable"></table>
+
+    <script>
+
+        d3.csv("auto-mpg.csv").then(function(data) {
+            var accelerationColumnName = "acceleration";
+
+            var counts = {};
+
+            data.forEach(function(row) {
+                var acceleration = row[accelerationColumnName];
+                counts[acceleration] = (counts[acceleration] || 0) + 1;
+            });
+
+            var table = d3.select("body").append("table");
+            var thead = table.append("thead");
+            var tbody = table.append("tbody");
+
+            thead.append("tr")
+                .selectAll("th")
+                .data(["Acceleration", "Count"])
+                .enter()
+                .append("th")
+                .text(function(d) { return d; });
+
+            var rows = tbody.selectAll("tr")
+                .data(Object.entries(counts))
+                .enter()
+                .append("tr");
+
+            var cells = rows.selectAll("td")
+                .data(function(d) { return d; })
+                .enter()
+                .append("td")
+                .text(function(d) { return d; });
+        });
+    </script>
+</body>
+</html>
+
+

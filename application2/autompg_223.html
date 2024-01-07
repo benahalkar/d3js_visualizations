@@ -1,0 +1,143 @@
+<!-- https://d3js.org/d3.v7.min.js -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto-mpg data Visualization</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #histogram {
+            width: 600px;
+            height: 400px;
+            margin: 20px;
+        }
+
+        .bar {
+            fill: steelblue;
+        }
+
+        .axis-label {
+            font-size: 14px;
+        }
+    </style>
+    <script src="d3.v7.min.js"></script>
+</head>
+<body>
+    <h1 style="font-family: Arial, sans-serif;">Auto-mpg count of cars by acceleration Table and histogram</h1><br>
+    <table id="csvTable"></table>
+    <div id="histogram"></div>
+
+    <script>
+        d3.csv("auto-mpg.csv").then(function(data) {
+            var accelerationColumnName = "acceleration";
+
+            var counts = {};
+
+            data.forEach(function(row) {
+                var acceleration = row[accelerationColumnName];
+                counts[acceleration] = (counts[acceleration] || 0) + 1;
+            });
+
+            var table = d3.select("#csvTable");
+            var thead = table.append("thead");
+            var tbody = table.append("tbody");
+
+            thead.append("tr")
+                .selectAll("th")
+                .data(["Acceleration", "Count"])
+                .enter()
+                .append("th")
+                .text(function(d) { return d; });
+
+            var rows = tbody.selectAll("tr")
+                .data(Object.entries(counts))
+                .enter()
+                .append("tr");
+
+            var cells = rows.selectAll("td")
+                .data(function(d) { return d; })
+                .enter()
+                .append("td")
+                .text(function(d) { return d; });
+            
+            var histogramData = Object.entries(counts).map(function(d) {
+                return { acceleration: +d[0], count: +d[1] };
+            });
+
+            var margin = {top: 10, right: 30, bottom: 30, left: 30};
+            var width = 600 - margin.left - margin.right;
+            var height = 400 - margin.top - margin.bottom;
+
+            var x = d3.scaleLinear()
+                .domain([d3.min(histogramData, function(d) { return d.acceleration; }), d3.max(histogramData, function(d) { return d.acceleration; })])
+                .range([0, width]);
+            
+            var bins = d3.histogram()
+                .domain(x.domain())
+                .thresholds(x.ticks(10))
+                (histogramData.map(function(d) { return d.acceleration; }));
+
+            var y = d3.scaleLinear()
+                .domain([0, d3.max(bins, function(d) { return d.length; })])
+                .range([height, 0]);
+
+            var xAxis = d3.axisBottom(x);
+            var yAxis = d3.axisLeft(y);
+
+            var svg = d3.select("#histogram").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.selectAll(".bar")
+                .data(bins)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d) { return x(d.x0); })
+                .attr("width", function(d) { return x(d.x1) - x(d.x0); })
+                .attr("y", function(d) { return y(d.length); })
+                .attr("height", function(d) { return height - y(d.length); });
+
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+
+            svg.append("g")
+                .call(yAxis);
+
+            svg.append('text')
+                .attr('class', 'x-label')
+                .attr('x', width / 2)
+                .attr('y', height + margin.top + 20)
+                .style('text-anchor', 'middle')
+                .text('Acceleration value')
+                .style('text-anchor', 'middle');
+
+            svg.append('text')
+                .attr('class', 'y-label')
+                .attr('transform', 'rotate(-90)')
+                .attr('x', -height / 2)
+                .attr('y', -margin.left - 10)
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle')
+                .text('Frequency')
+                .style('text-anchor', 'middle');
+
+        });
+    </script>
+</body>
+</html>

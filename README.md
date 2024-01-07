@@ -36,6 +36,10 @@ https://github.com/vega/vega/blob/main/docs/data/seattle-weather.csv
 | seattle_131     | Dynamic histogram plot showing wind variable distribution, with user-settable bin size between 5-25 in increments of 5 |
 | seattle_132     | Dynamic histogram plot showing user-selectable parameter distribution such as precipitation, temp_max, temp_min and wind variables, with user-settable bin size between 5-25 in increments of 5 |
 
+<br>
+
+Demo
+![application 1](./images/application1.png)
 
 <br><br><br>
 
@@ -58,6 +62,11 @@ https://github.com/plotly/datasets/blob/master/auto-mpg.csv
 | autompg_222     | Line-chart displaying total number of cylinders for each model year |
 | autompg_223     | Histogram displaying count of the number of cars of each acceleration |
 
+<br>
+
+Demo
+![application 2](./images/application2.png)
+
 <br><br><br>
 
 ### **APPLICATION 3**
@@ -74,6 +83,11 @@ https://github.com/benahalkar/d3js_visualizations/blob/main/application3/miserab
 | miserables_311  | Network graph showing character co-occurrence in the dataset (without character labels)      |
 | miserables_312  | Network graph showing character co-occurrence in the dataset (with character/node labels)    |
 | miserables_313  | Adding **fisheye distortion** to the network graph for better visibility                 |
+
+<br>
+
+Demo
+![application 3](./images/application3.png)
 
 <br><br><br>
 
